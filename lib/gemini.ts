@@ -9,6 +9,13 @@ if (!GEMINI_API_KEY) {
 
 const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 
+/** Stable model ID — 1.5 Flash was retired from the API; see https://ai.google.dev/gemini-api/docs/models/gemini */
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+
+function getGeminiModelId(): string {
+  return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+}
+
 const PROMPT_TEMPLATE = `You are a sustainability consultant creating B2B proposals.
 
 Generate a sustainable product proposal based on the client's requirements.
@@ -67,7 +74,7 @@ export async function generateProposalWithGemini(
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: getGeminiModelId() });
   const prompt = buildPrompt(input);
 
   const result = await model.generateContent(prompt);

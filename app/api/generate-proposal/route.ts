@@ -93,8 +93,13 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Database connection failed";
-    return errorResponse(`MongoDB error: ${message}`, 503, "MONGODB_ERROR");
+    const message =
+      e instanceof Error ? e.message : "Database connection failed";
+    return errorResponse(
+      `MongoDB error: ${message}`,
+      503,
+      "MONGODB_ERROR"
+    );
   }
 
   const doc = await Proposal.create({

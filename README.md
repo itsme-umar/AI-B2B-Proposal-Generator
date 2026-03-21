@@ -39,14 +39,23 @@ cp .env.example .env.local
 
 Edit `.env.local`:
 
-- **MONGODB_URI** – MongoDB connection string (e.g. from [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)). Example:  
-  `mongodb+srv://user:password@cluster.mongodb.net/ai-b2b-proposals?retryWrites=true&w=majority`
+- **MONGODB_URI** – Choose one:
+  - **Local (e.g. Homebrew on Mac):** `mongodb://127.0.0.1:27017/ai-b2b-proposals` — start MongoDB first (`brew services start mongodb-community` or your install’s service name).
+  - **Atlas (cloud):** copy the full string from [Atlas](https://www.mongodb.com/cloud/atlas) → **Database → Connect → Drivers**. Host must be like `cluster0.abc12.mongodb.net` — **never** the fake host `cluster.mongodb.net` (causes DNS / “fake hostname” errors).
 - **GEMINI_API_KEY** – API key from [Google AI Studio](https://aistudio.google.com/apikey)
+- **GEMINI_MODEL** (optional) – Model id, default `gemini-2.5-flash`. Older ids like `gemini-1.5-flash` return 404; see [Gemini models](https://ai.google.dev/gemini-api/docs/models/gemini).
 
 ### 3. MongoDB
 
-- Create a cluster (e.g. on MongoDB Atlas) and get the connection string.
-- No need to create the database or collection manually; the app will create the `Proposal` collection when the first proposal is saved.
+- **Local:** Install/start MongoDB, set `MONGODB_URI=mongodb://127.0.0.1:27017/ai-b2b-proposals`.
+- **Atlas:** Create a cluster and use the **Drivers** connection string (real `cluster0....mongodb.net` host).
+- You do not need to create the database or collection manually; Mongoose creates collections on first write.
+
+**Troubleshooting `querySrv ENOTFOUND _mongodb._tcp...`**
+
+- You are almost certainly using an invalid hostname (often the README placeholder `cluster.mongodb.net`). Use the exact SRV string from Atlas.
+- If your password contains `@`, `#`, `:`, etc., [URL-encode](https://www.mongodb.com/docs/atlas/troubleshoot-connection/#special-characters-in-connection-string-password) it in the URI.
+- Rarely: corporate DNS/firewall blocks SRV lookups — try another network or Atlas support docs for non-SRV connection strings.
 
 ### 4. Gemini API
 
